@@ -10,12 +10,12 @@ WORKDIR /usr/src/app
 # Copiar primero las dependencias para aprovechar la caché de Docker
 COPY package*.json ./
 
+# Actualizar npm globalmente a una versión limpia de CVES y dependencias vulnerables
+RUN npm install -g npm@latest
+
 # Instalar dependencias estrictamente para producción
 # Dado que ya generamos el package-lock.json, podemos usar 'npm ci'
-RUN npm ci --omit=dev && \
-    # Eliminar npm del contenedor final para erradicar las vulnerabilidades (cross-spawn, glob, tar, etc.)
-    npm cache clean --force && \
-    rm -rf /usr/local/lib/node_modules/npm /usr/local/bin/npm
+RUN npm ci --omit=dev
 
 # Copiar el archivo del servidor
 COPY server.js ./
