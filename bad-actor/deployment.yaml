@@ -1,0 +1,33 @@
+# ============================================================
+# BAD ACTOR — Deliberately Insecure Deployment
+# Used in workshop to demonstrate Kyverno blocking
+# THIS WILL BE DENIED by Fortress policies
+# ============================================================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bad-actor
+  namespace: default
+  labels:
+    app: bad-actor
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bad-actor
+  template:
+    metadata:
+      labels:
+        app: bad-actor
+    spec:
+      # ❌ No runAsNonRoot - will run as root
+      hostNetwork: true  # ❌ disallow-host-network
+      containers:
+        - name: bad-actor
+          image: nginx:latest  # ❌ disallow-latest-tag
+          # ❌ No resource limits - disallow-resource-limits
+          securityContext:
+            privileged: true             # ❌ disallow-privileged-containers
+            runAsUser: 0                 # ❌ disallow-root-user
+            allowPrivilegeEscalation: true
+            readOnlyRootFilesystem: false # ❌ require-readonly-rootfs

@@ -1,0 +1,73 @@
+# ============================================================
+# Refugee Tracker API — Secure Deployment
+# Passes all 6 Fortress Kyverno policies
+# ============================================================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: refugee-tracker
+  namespace: default
+  labels:
+    app: refugee-tracker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: refugee-tracker
+  template:
+    metadata:
+      labels:
+        app: refugee-tracker
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+      containers:
+        - name: refugee-tracker
+          image: ghcr.io/joselorenzana272/refugee-tracker:v1.0.0
+          ports:
+            - containerPort: 8080
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            allowPrivilegeEscalation: false
+            privileged: false
+            readOnlyRootFilesystem: true
+          resources:
+            limits:
+              cpu: "200m"
+              memory: "256Mi"
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+      volumes:
+        - name: tmp
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: refugee-tracker
+  namespace: default
+spec:
+  selector:
+    app: refugee-tracker
+  ports:
+    - port: 80
+      targetPort: 8080
+  type: ClusterIP
