@@ -13,11 +13,17 @@ WORKDIR /app
 # Crear un usuario no root para cumplir con la política 'runAsNonRoot: true'
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 
+# Actualizar el sistema operativo base y limpiar paquetes vulnerables
+RUN apk upgrade --no-cache && \
+    pip install --no-cache-dir --upgrade pip setuptools wheel
+
 # Instalar las dependencias de Python como usuario root, pero en un directorio temporal 
 # o copiarlas posteriormente. Para Alpine, a veces se requiere build-base si hay dependencias C.
 # En este caso Flask es puro Python.
 COPY requirements.txt /app/
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt && \
+    # Eliminar paquetes sensibles o de desarrollo que no se requieren en producción para evitar CVES.
+    pip uninstall -y setuptools wheel pip
 
 # Copiar el código fuente de la aplicación
 COPY app.py /app/
