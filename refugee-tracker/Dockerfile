@@ -1,5 +1,5 @@
 # Imagen base definida específicamente (nunca 'latest')
-FROM node:20.12.2-alpine3.19
+FROM node:20.18.0-alpine3.19
 
 # Establecer la directiva de entorno de producción
 ENV NODE_ENV=production
@@ -12,7 +12,10 @@ COPY package*.json ./
 
 # Instalar dependencias estrictamente para producción
 # Dado que ya generamos el package-lock.json, podemos usar 'npm ci'
-RUN npm ci --omit=dev
+RUN npm ci --omit=dev && \
+    # Eliminar npm del contenedor final para erradicar las vulnerabilidades (cross-spawn, glob, tar, etc.)
+    npm cache clean --force && \
+    rm -rf /usr/local/lib/node_modules/npm /usr/local/bin/npm
 
 # Copiar el archivo del servidor
 COPY server.js ./
