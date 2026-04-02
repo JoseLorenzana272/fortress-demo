@@ -11,8 +11,8 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 
 # Instalar dependencias estrictamente para producción
-# No usar npm install directamente así evitamos que cargue desarrollo
-RUN npm ci --only=production
+# Dado que ya generamos el package-lock.json, podemos usar 'npm ci'
+RUN npm ci --omit=dev
 
 # Copiar el archivo del servidor
 COPY server.js ./
