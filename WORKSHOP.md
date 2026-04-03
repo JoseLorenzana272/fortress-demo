@@ -235,6 +235,9 @@ Error: FORTRESS SECURITY: Running as root is not allowed!
 
 ```bash
 kubectl run hacker --image=nginx:latest
+
+kubectl apply -f whistleblower-portal/deployment.yaml
+kubectl port-forward svc/whistleblower-portal 8081:80
 ```
 
 **Expected output:**
