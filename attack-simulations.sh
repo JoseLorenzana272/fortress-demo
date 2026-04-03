@@ -34,10 +34,10 @@ attack_1() {
   echo -e "${RED}⚔  ATTACK 1: Deploying a malicious container${NC}"
   echo -e "${CYAN}Scenario: A hacker gains access to the cluster and tries"
   echo -e "to deploy a privileged container running as root.${NC}\n"
-  echo -e "Running: kubectl apply -f demo/bad-actor/deployment.yaml\n"
+  echo -e "Running: kubectl apply -f bad-actor/deployment.yaml\n"
   pause
 
-  kubectl apply -f demo/bad-actor/deployment.yaml 2>&1 || true
+  kubectl apply -f bad-actor/deployment.yaml 2>&1 || true
 
   echo -e "\n${GREEN}✓ FORTRESS BLOCKED IT${NC}"
   echo -e "Kyverno denied the deployment before it ever ran."
@@ -76,7 +76,7 @@ attack_3() {
 
   if [ -z "$POD" ]; then
     echo -e "${RED}Whistleblower portal not running. Deploy it first:${NC}"
-    echo -e "kubectl apply -f demo/whistleblower-portal/deployment.yaml"
+    echo -e "kubectl apply -f whistleblower-portal/deployment.yaml"
     pause
     return
   fi
