@@ -1,5 +1,4 @@
 # 🏰 Fortress in a Box — Workshop Guide
-### 1 Hour | University Students + Junior Engineers
 
 ---
 
