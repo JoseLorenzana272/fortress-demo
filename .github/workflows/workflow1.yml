@@ -57,14 +57,14 @@ jobs:
       - name: Build image for Refugee Tracker
         run: |
           docker build \
-            -t ${{ env.IMAGE_NAME }}-refugee:latest \
-            -t ${{ env.IMAGE_NAME }}-refugee:${{ github.sha }} ./refugee-tracker
+            -t ${{ env.IMAGE_NAME }}/refugee-tracker:latest \
+            -t ${{ env.IMAGE_NAME }}/refugee-tracker:${{ github.sha }} ./refugee-tracker
 
       - name: Build image for Whistleblower Portal
         run: |
           docker build \
-            -t ${{ env.IMAGE_NAME }}-whistleblower:latest \
-            -t ${{ env.IMAGE_NAME }}-whistleblower:${{ github.sha }} ./whistleblower-portal
+            -t ${{ env.IMAGE_NAME }}/whistleblower-portal:latest \
+            -t ${{ env.IMAGE_NAME }}/whistleblower-portal:${{ github.sha }} ./whistleblower-portal
 
       - name: Run Trivy scanner on Refugee Tracker image
         uses: aquasecurity/trivy-action@0.35.0
@@ -88,10 +88,10 @@ jobs:
 
       - name: Push image
         run: |
-            docker push ${{ env.IMAGE_NAME }}-refugee:latest
-            docker push ${{ env.IMAGE_NAME }}-refugee:${{ github.sha }}
-            docker push ${{ env.IMAGE_NAME }}-whistleblower:latest
-            docker push ${{ env.IMAGE_NAME }}-whistleblower:${{ github.sha }}
+            docker push ${{ env.IMAGE_NAME }}/refugee-tracker:latest
+            docker push ${{ env.IMAGE_NAME }}/refugee-tracker:${{ github.sha }}
+            docker push ${{ env.IMAGE_NAME }}/whistleblower-portal:latest
+            docker push ${{ env.IMAGE_NAME }}/whistleblower-portal:${{ github.sha }}
 
       - name: Update deployment image tags
         run: |
@@ -104,8 +104,8 @@ jobs:
           #   sed -i "s|image: ghcr.io/${{ github.repository_owner }}/.*|image: ${{ env.IMAGE_NAME }}:${{ github.sha }}|g" k8s/worker-deployment.yaml
           #   sed -i "s|image: ghcr.io/${{ github.repository_owner }}/.*|image: ${{ env.IMAGE_NAME }}:${{ github.sha }}|g" k8s/frontend-deployment.yaml
           # -------------------------------------------------------
-          sed -i "s|image: ghcr.io/${{ github.repository_owner }}/.*|image: ${{ env.IMAGE_NAME }}-refugee:${{ github.sha }}|g" refugee-tracker/deployment.yaml
-          sed -i "s|image: ghcr.io/${{ github.repository_owner }}/.*|image: ${{ env.IMAGE_NAME }}-whistleblower:${{ github.sha }}|g" whistleblower-portal/deployment.yaml
+          sed -i "s|image: ghcr.io/${{ github.repository_owner }}/.*|image: ${{ env.IMAGE_NAME }}/refugee-tracker:${{ github.sha }}|g" refugee-tracker/deployment.yaml
+          sed -i "s|image: ghcr.io/${{ github.repository_owner }}/.*|image: ${{ env.IMAGE_NAME }}/whistleblower-portal:${{ github.sha }}|g" whistleblower-portal/deployment.yaml
 
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
