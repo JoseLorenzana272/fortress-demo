@@ -104,14 +104,20 @@ jobs:
           #   sed -i "s|image: ghcr.io/${{ github.repository_owner }}/.*|image: ${{ env.IMAGE_NAME }}:${{ github.sha }}|g" k8s/worker-deployment.yaml
           #   sed -i "s|image: ghcr.io/${{ github.repository_owner }}/.*|image: ${{ env.IMAGE_NAME }}:${{ github.sha }}|g" k8s/frontend-deployment.yaml
           # -------------------------------------------------------
-          sed -i "s|image: ghcr.io/${{ github.repository_owner }}/.*|image: ${{ env.IMAGE_NAME }}/refugee-tracker:${{ github.sha }}|g" refugee-tracker/deployment.yaml
-          sed -i "s|image: ghcr.io/${{ github.repository_owner }}/.*|image: ${{ env.IMAGE_NAME }}/whistleblower-portal:${{ github.sha }}|g" whistleblower-portal/deployment.yaml
+          sed -i "s|image: ghcr.io/.*|image: ${{ env.IMAGE_NAME }}/refugee-tracker:${{ github.sha }}|g" refugee-tracker/deployment.yaml
+          sed -i "s|image: ghcr.io/.*|image: ${{ env.IMAGE_NAME }}/whistleblower-portal:${{ github.sha }}|g" whistleblower-portal/deployment.yaml
 
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
           git add refugee-tracker/deployment.yaml whistleblower-portal/deployment.yaml
-          git commit -m "ci: update image tag to ${{ github.sha }}" || true
-          git push
+          
+          # Solo hacer commit y push si hay cambios
+          if git diff --staged --quiet; then
+            echo "No hay cambios en la imagen para comitear"
+          else
+            git commit -m "ci: update image tag to ${{ github.sha }}"
+            git push origin HEAD:${{ github.ref_name }}
+          fi
 
       - name: Clean up local Docker cache
         run: docker system prune -af
