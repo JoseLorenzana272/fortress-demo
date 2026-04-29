@@ -1,6 +1,6 @@
 # Usar una imagen base específica y reducida (Alpine) para minimizar vulnerabilidades.
 # NUNCA usar la etiqueta 'latest' para pasar las políticas de Trivy / ValidatingPolicies.
-FROM python:3.8
+FROM python:3.9.7-alpine3.13
 
 # Definir variables de entorno de Python
 ENV PYTHONDONTWRITEBYTECODE=1 \
