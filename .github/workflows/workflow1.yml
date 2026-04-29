@@ -104,12 +104,12 @@ jobs:
           #   sed -i "s|image: ghcr.io/${{ github.repository_owner }}/.*|image: ${{ env.IMAGE_NAME }}:${{ github.sha }}|g" k8s/worker-deployment.yaml
           #   sed -i "s|image: ghcr.io/${{ github.repository_owner }}/.*|image: ${{ env.IMAGE_NAME }}:${{ github.sha }}|g" k8s/frontend-deployment.yaml
           # -------------------------------------------------------
-          sed -i "s|image: ghcr.io/.*|image: ${{ env.IMAGE_NAME }}/refugee-tracker:${{ github.sha }}|g" refugee-tracker/deployment.yaml
-          sed -i "s|image: ghcr.io/.*|image: ${{ env.IMAGE_NAME }}/whistleblower-portal:${{ github.sha }}|g" whistleblower-portal/deployment.yaml
+          sed -i "s|image: ghcr.io/.*|image: ${{ env.IMAGE_NAME }}/refugee-tracker:${{ github.sha }}|g" k8s/deployment-refugee.yaml
+          sed -i "s|image: ghcr.io/.*|image: ${{ env.IMAGE_NAME }}/whistleblower-portal:${{ github.sha }}|g" k8s/deployment-whistle.yaml
 
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-          git add refugee-tracker/deployment.yaml whistleblower-portal/deployment.yaml
+          git add k8s/deployment-refugee.yaml k8s/deployment-whistle.yaml
           
           # Solo hacer commit y push si hay cambios
           if git diff --staged --quiet; then
