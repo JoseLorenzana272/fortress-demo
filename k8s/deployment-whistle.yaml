@@ -24,7 +24,7 @@ spec:
         runAsUser: 1000
       containers:
         - name: whistleblower-portal
-          image: ghcr.io/joselorenzana272/fortress-demo/whistleblower-portal:4bf795a4a024dd706e63b4dcc32a0eb49dcdde69
+          image: ghcr.io/joselorenzana272/fortress-demo/whistleblower-portal:eff6ba6f22e7162ec1b94899847152b7a8b8130e
           ports:
             - containerPort: 8080
           securityContext:
