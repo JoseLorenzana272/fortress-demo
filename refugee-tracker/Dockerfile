@@ -10,8 +10,9 @@ WORKDIR /usr/src/app
 # Copiar primero las dependencias para aprovechar la caché de Docker
 COPY package*.json ./
 
-# Actualizar npm globalmente a una versión limpia de CVES y dependencias vulnerables
-RUN npm install -g npm@latest
+# Actualizar npm a una versión compatible con Node 20.18.0.
+# npm@12 requiere Node 22/24, por lo que no es compatible con esta base image.
+RUN npm install -g npm@10.8.2
 
 # Instalar dependencias estrictamente para producción
 # Dado que ya generamos el package-lock.json, podemos usar 'npm ci'
