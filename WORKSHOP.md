@@ -140,16 +140,39 @@ Get the pod name first:
 kubectl get pods
 ```
 
-Then try to open a shell in the app pod:
+Then try to open a shell in either app pod:
 
 ```bash
 kubectl exec -it <whistleblower-pod-name> -- /bin/sh
+# or
+kubectl exec -it <refugee-tracker-pod-name> -- /bin/sh
 ```
 
 Expected result:
 - Falco fires an alert
 - Discord receives the notification
 - Grafana shows the event in the security logs
+
+The Falco rule is not tied to an application name. It monitors containers cluster-wide, so both commands generate the same `Terminal shell in container` alert. Allow a few seconds for the event to reach Discord and Loki.
+
+### Test 3b - suspicious file access and password search
+
+Use the pod name of either `refugee-tracker` or `whistleblower-portal`:
+
+```bash
+# read /etc/passwd
+kubectl exec <pod-name> -- cat /etc/passwd
+
+# search for the word password
+kubectl exec <pod-name> -- grep password /etc/hostname
+```
+
+Expected result:
+- the first command triggers `Fortress Read Passwd File`
+- the second command triggers `Fortress Grep Passwords`
+- both alerts have `Warning` priority and are sent to Discord and Loki
+
+These checks are intentionally read-only and can be run against either demo application.
 
 ---
 

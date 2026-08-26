@@ -69,14 +69,25 @@ attack_3() {
   header
   echo -e "${RED}⚔  ATTACK 3: Opening a shell inside a running container${NC}"
   echo -e "${CYAN}Scenario: A hacker has exploited a vulnerability in the"
-  echo -e "whistleblower portal and opens a reverse shell.${NC}\n"
+  echo -e "application and opens a reverse shell.${NC}\n"
   echo -e "${YELLOW}Watch your Discord channel and Grafana dashboard!${NC}\n"
 
-  POD=$(kubectl get pod -l app=whistleblower-portal -o jsonpath='{.items[0].metadata.name}' 2>/dev/null)
+  read -r -p "Target app [whistleblower-portal/refugee-tracker]: " TARGET_APP
+  TARGET_APP=${TARGET_APP:-whistleblower-portal}
+
+  case "$TARGET_APP" in
+    whistleblower-portal|refugee-tracker) ;;
+    *)
+      echo -e "${RED}Unknown target. Choose whistleblower-portal or refugee-tracker.${NC}"
+      pause
+      return
+      ;;
+  esac
+
+  POD=$(kubectl get pod -l app="$TARGET_APP" -o jsonpath='{.items[0].metadata.name}' 2>/dev/null)
 
   if [ -z "$POD" ]; then
-    echo -e "${RED}Whistleblower portal not running. Deploy it first:${NC}"
-    echo -e "kubectl apply -f whistleblower-portal/deployment.yaml"
+    echo -e "${RED}${TARGET_APP} is not running. Deploy it first.${NC}"
     pause
     return
   fi
@@ -89,7 +100,50 @@ attack_3() {
 
   echo -e "\n${GREEN}✓ FALCO DETECTED IT${NC}"
   echo -e "Check Discord — alert should have fired within seconds."
-  echo -e "Check Grafana — Security Events Log shows the intrusion."
+  echo -e "Check Grafana — Security Events Log shows the intrusion for ${TARGET_APP}."
+  pause
+}
+
+# ============================================================
+# ATTACK 3B — Suspicious file access inside a container
+# ============================================================
+attack_3b() {
+  header
+  echo -e "${RED}⚔  ATTACK 3B: Inspecting sensitive files in a container${NC}"
+  echo -e "${CYAN}Scenario: An attacker searches the container for account"
+  echo -e "information and possible credentials.${NC}\n"
+  echo -e "${YELLOW}Watch your Discord channel and Grafana dashboard!${NC}\n"
+
+  read -r -p "Target app [whistleblower-portal/refugee-tracker]: " TARGET_APP
+  TARGET_APP=${TARGET_APP:-whistleblower-portal}
+
+  case "$TARGET_APP" in
+    whistleblower-portal|refugee-tracker) ;;
+    *)
+      echo -e "${RED}Unknown target. Choose whistleblower-portal or refugee-tracker.${NC}"
+      pause
+      return
+      ;;
+  esac
+
+  POD=$(kubectl get pod -l app="$TARGET_APP" -o jsonpath='{.items[0].metadata.name}' 2>/dev/null)
+
+  if [ -z "$POD" ]; then
+    echo -e "${RED}${TARGET_APP} is not running. Deploy it first.${NC}"
+    pause
+    return
+  fi
+
+  echo -e "Target pod: ${POD}"
+  echo -e "Running read-only detection tests...\n"
+  pause
+
+  kubectl exec "$POD" -- cat /etc/passwd >/dev/null 2>&1 || true
+  kubectl exec "$POD" -- grep password /etc/hostname 2>/dev/null || true
+
+  echo -e "\n${GREEN}✓ FALCO DETECTION TESTS SENT${NC}"
+  echo -e "Expected rules: Fortress Read Passwd File and Fortress Grep Passwords."
+  echo -e "Both alerts should appear in Discord and Grafana within seconds."
   pause
 }
 
@@ -134,6 +188,7 @@ main() {
   echo -e "  ${RED}1${NC} — Deploy malicious container (Kyverno blocks)"
   echo -e "  ${RED}2${NC} — Spawn root container (Kyverno blocks)"
   echo -e "  ${RED}3${NC} — Shell in container (Falco detects + Discord alert)"
+  echo -e "  ${RED}3b${NC} — Inspect sensitive files (Falco detects)"
   echo -e "  ${RED}4${NC} — Delete security policies (ArgoCD restores)"
   echo -e "  ${RED}a${NC} — Run ALL attacks in sequence"
   echo -e "  ${RED}q${NC} — Quit\n"
@@ -144,8 +199,9 @@ main() {
     1) attack_1 ;;
     2) attack_2 ;;
     3) attack_3 ;;
+    3b) attack_3b ;;
     4) attack_4 ;;
-    a) attack_1; attack_2; attack_3; attack_4 ;;
+    a) attack_1; attack_2; attack_3; attack_3b; attack_4 ;;
     q) exit 0 ;;
     *) echo "Invalid choice" ;;
   esac
