@@ -24,7 +24,7 @@ spec:
         runAsUser: 1000
       containers:
         - name: refugee-tracker
-          image: ghcr.io/joselorenzana272/fortress-demo/refugee-tracker:794a8ced98ec1b7bd836c1b2f13ec22c2db1fea7
+          image: ghcr.io/joselorenzana272/fortress-demo/refugee-tracker:ea7bc2e9b8c5bd88e09622eca3655cd9cad9128b
           ports:
             - containerPort: 8080
           securityContext:
