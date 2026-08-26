@@ -12,7 +12,7 @@ COPY package*.json ./
 
 # Actualizar npm a una versión compatible con Node 20.18.0.
 # npm@12 requiere Node 22/24, por lo que no es compatible con esta base image.
-RUN npm install -g npm@10.9.8
+RUN npm install -g npm@10.9.9
 
 # Instalar dependencias estrictamente para producción
 # Dado que ya generamos el package-lock.json, podemos usar 'npm ci'
